@@ -1,0 +1,130 @@
+<%- include('partials/header.ejs'); -%>
+<!-- Header -->
+<div class="flex w-full flex-col mb-32">
+  <% books.forEach(book => { %>
+    <div class="bg-primary-tanGrey w-full">
+      <div class="flex max-w-[1160px] mx-[140px] justify-between">
+        <!--Left Section-->
+        <div class="flex flex-col w-1/2 justify-center">
+        <h1 class="font-main text-6xl pt-[150px]"> Happy Reading</h1>
+        <p class="font-body text-2xl py-14 max-w-2xl font-normal">Thank you for visiting my library! Here, you'll find a collection of books I've read, complete with personal symmaries and ratings on a 1-to-5-star scale. On the right you can see what I'm currently reading- stay tuned for my thoughts on that one soon!</p>
+        <div class="flex flex-row pb-14">
+          <form action="/add" method="post">
+            <input type="submit" name="add" value="new" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+        <button id="add" class="bg-accent-gold hover:bg-accent-gold/70 transition duration-500 rounded-full text-base font-bold text-white max-w-[200px] py-3 px-10" type="submit">Add A Book
+          <img id="icon" class="inline-block w-6 h-6 hover:translate-x-1 duration-300 transform" src="/images/arrow_upward_24px.png" alt="upward arrow">
+        </button>
+      </form>
+      </div>
+        </div>
+        <!--Right Section-->
+        <div class="flex flex-col items-center">
+           <h1 class="font-main text-3xl mb-6 text-right pt-20">What I'm reading in <%= currentMonthName %>
+           </h1>
+           <% if (latestBook.coverUrl) { %>
+           <img id="cover" class="pt-6 max-w-xs h-fit pb-32" src="<%=latestBook.coverUrl%>" alt="book cover"> 
+          <% } else { %>
+            <p>No cover available</p>
+
+          <% } %>
+        </div>
+    </div>
+  </div>
+
+    <!-- Content Section -->
+     <section class="flex flex-col max-w-[1160px] pb-32 mx-[140px] justify-between">
+      <div class="flex flex-row justify-between mt-90 mb-60">
+      <h2 class="text-5xl font-main pb-8">Keep the story going...</h2>
+      <!-- Sort Dropdown Menu-->
+      <div class="relative inline-block text-left">
+        <div class="w-56">
+          <button type="button" class="inline-flex w-full gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900/50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 border-red-500" id="menu-button" aria-expanded="true" aria-haspopup="true"> Sort
+            <svg class="-mr-1 size-5 text-accent-gold" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+              <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+                <!--
+                  Dropdown menu, show/hide based on menu state.
+              
+                  Entering: "transition ease-out duration-100"
+                    From: "transform opacity-0 scale-95"
+                    To: "transform opacity-100 scale-100"
+                  Leaving: "transition ease-in duration-75"
+                    From: "transform opacity-100 scale-100"
+                    To: "transform opacity-0 scale-95"
+                --> 
+                    
+          <div class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1" hidden>
+            <div class="py-1 Active:bg-gray-100 text-gray-900 outline-none Not Active:text-gray-700" role="none">
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-0">Title</a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1">Author</a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-2">Date</a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">Rating</a>
+            </div>         
+          </div>
+      </div>
+      </div>
+        <p class="font-body text-2xl sm:max-w-3xl mb-60">This list will grow as I read more. Sort by title, date, author, or rating on the right. Bookmark this page for updates and my notes - but dont just take my word for it!
+        </p>
+        
+        <!--Book Recommendations-->
+        <section class="flex flex-row gap-8 mb-14">
+          <div class="flex flex-col sm:w-367">
+            <img id="titleCover" class=" max-w-xs h-fit mb-8 bg-contain" src="/images/bookcover.jpg" alt="book cover">
+            <h3 id="title" class="mb-1.5 font-bold font-body text-2xl"><%= book.title %></h3>
+            <p id="author" class="text-2xl">By: <%=book.author %></p>
+            <p id="date" class="text-xl font-light">Read: <%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %> </p>
+            <div id="item" class="flex flex-row justify-between">
+              <div class="flex w-6 h-6 justify-start" data-rating="<%= book.rating%>"></div>
+              <div class="flex-row flex space-x-1">
+              <form action="/edit" method="post">
+                <input type="hidden" name="updatedItemId" value="">
+                <input id="input" type="text" name="updatedItemTitle" value="" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true">
+                <input id="input" type="text" name="updatedItemAuthor" value="" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
+                <input id="input" type="text" name="updatedItemDate" value="" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+               <button id="done" class="" type="submit" hidden>
+                <img class="w-6 h-6" src="/images/icons8-check-30.png" alt="tick image">
+               </button> 
+              <button id="edit" class="w-6 h-6">
+                <img id="icon" class="" src="/images/icons8-edit-24 1.png" alt="pencil image">
+              </button>
+            </form>
+              <form action="/delete" method="post">
+                <button id="done" class="" type="submit">
+                  <img id="" class="w-6 h-6" src="/images/delete_24px.png" alt="trash image">
+                </button>
+              </form>
+              </div>
+          </div>
+            <p class="font-body text-base"><%= book.synopsis.slice(0, 140) + "..." %></p>
+            <div class="flex flex-row pr-1.5">
+            <a href="" class="text-accent-mauve hover:text-accent-mauve/70"> Read more
+              <img id="" class="w-6 h-6 inline-block hover:translate-x-1 duration-300 transform" src="/images/arrow_right_alt_24px.png" alt="right arrow">
+            </a>
+            </div>
+          </div>
+
+        </section>
+      </section>
+      <% }); %>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const starContainer = document.querySelectorAll("[data-rating]");
+        starContainer.forEach(container => {
+          const rating = parseInt(container.getAttribute("data-rating"));//Get rating
+          container.innerHTML = '';
+          for (let i = 0; i < 5; i++) {
+          const starImage = document.createElement('img');
+          starImage.src = i < rating ? "/images/full_star.png" : "/images/empty_star.png";
+          starImage.alt = i < rating ? "Full star" : "Empty star";
+          container.appendChild(starImage); 
+          }
+        });
+      });
+    </script>
+
+
+<%- include('partials/footer.ejs'); -%>

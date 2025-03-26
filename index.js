@@ -1,0 +1,100 @@
+import express from "express";
+import bodyParser from "body-parser";
+import pg from "pg";
+import axios from "axios";
+
+const app = express();
+const port = 3000;
+const API_URL = `https://covers.openlibrary.org/b/isbn/`;
+const size = 'M'
+
+// Connect to database 
+const db = new pg.Client({
+    user: "postgres",
+    host: "localhost",
+    database: "library",
+    password: "postR095rock!!",
+    port: 5432
+});
+db.connect();
+
+
+//Middlware
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(express.static("public"));
+
+//Get home page
+app.get("/", async (req,res) => {
+    const today = new Date();
+    const month = today.getMonth();
+    const monthNames = ["January", "February","March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentMonthName = monthNames[month];
+
+    try {
+        const result = await db.query("SELECT * FROM books ORDER BY id ASC");
+        const books = result.rows;
+        console.log(books);
+   
+        //Fetch book covers for each book
+        const bookWithCovers = await Promise.all(
+            books.map(async (book) => {
+                try {
+                    const coverUrl = `${API_URL}${book.isbn}-${size}.jpg`;
+                    console.log(`Cover URL for book title ${book.title}:`, coverUrl);
+                    return {...book, coverUrl};
+                } catch (apiError) {
+                    console.error(`Error fetching cover for ISBN: ${book.isbn}`, apiError);
+                    return {...book, coverUrl: null};
+                }
+            })
+        );
+
+        const latestBook = bookWithCovers.length > 0 ? bookWithCovers[bookWithCovers.length - 1] : null;
+
+
+        res.render("index.ejs", { 
+            currentMonthName,
+            books: bookWithCovers,
+            latestBook
+        });
+    } catch (err) {
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+//Post new item
+app.post("/add", async (req, res) => {
+    if (req.body.add === "new") {
+        res.render("new.ejs")
+        const title = req.body.title;
+        const author = req.body.author;
+        const rating = req.body.rating;
+        const date = date;
+        const synopsis = req.body.synopsis;
+        const isbn = req.body.isbn;
+        const insertQuery = 'INSERT INTO books VALUES ($1, $2, $3, $4, $5, $6)';
+            try {
+            await db.query(insertQuery, 
+                [title, 
+                author, 
+                rating, 
+                date, 
+                synopsis, 
+                isbn]
+            );
+        } catch (err) {
+            console.log(err);        
+        }
+     } else {
+        res.redirect("/");
+    }
+});
+
+//Edit book
+
+
+//Delete book
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
