@@ -1,7 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
-import axios from "axios";
 
 const app = express();
 const port = 3000;
@@ -14,7 +13,7 @@ const db = new pg.Client({
     host: "localhost",
     database: "library",
     password: "postR095rock!!",
-    port: 5432
+    port: 5432,
 });
 db.connect();
 
@@ -64,16 +63,12 @@ app.get("/", async (req,res) => {
 
 //Post new item
 app.post("/add", async (req, res) => {
+    res.render("new.ejs");
+    const { title, author, rating, date, synopsis, isbn } = req.body;
+
     if (req.body.add === "new") {
-        res.render("new.ejs")
-        const title = req.body.title;
-        const author = req.body.author;
-        const rating = req.body.rating;
-        const date = date;
-        const synopsis = req.body.synopsis;
-        const isbn = req.body.isbn;
-        const insertQuery = 'INSERT INTO books VALUES ($1, $2, $3, $4, $5, $6)';
-            try {
+        const insertQuery = 'INSERT INTO books (title, author, rating, date, synopsis, isbn) VALUES ($1, $2, $3, $4, $5, $6)';
+        try {
             await db.query(insertQuery, 
                 [title, 
                 author, 
@@ -87,10 +82,21 @@ app.post("/add", async (req, res) => {
         }
      } else {
         res.redirect("/");
-    }
+    }       
 });
 
 //Edit book
+app.post("/edit", async (req, res) => {
+    const {updatedTitle, updatedAuthor, updatedRating, updatedDate, updatedSynopsis, updatedIsbn, updatedBookId} = req.body;
+    const updateQuery = 'UPDATE books SET title = ($1), author = ($2), rating = ($3), date = ($4), synopsis = ($5), isbn = ($6) WHERE id = ($7)';
+    try {
+        await db.query(updateQuery, [updatedTitle, updatedAuthor, updatedRating, updatedDate, updatedSynopsis, updatedIsbn, updatedBookId]);
+        res.redirect("/");
+    } catch (err) {
+        console.error("Error updating book", err.stack);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 
 //Delete book
