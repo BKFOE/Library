@@ -61,29 +61,25 @@ app.get("/", async (req,res) => {
     }
 });
 
+//Get add book form
+app.get("/add", async (req,res) => {
+    res.render("new.ejs");
+})
+
 //Post new item
 app.post("/add", async (req, res) => {
-    res.render("new.ejs");
-    const { title, author, rating, date, synopsis, isbn } = req.body;
-
-    if (req.body.add === "new") {
-        const insertQuery = 'INSERT INTO books (title, author, rating, date, synopsis, isbn) VALUES ($1, $2, $3, $4, $5, $6)';
+    const { newTitle, newAuthor, newRating, newDate, newSynopsis, newIsbn } = req.body;
+    const insertQuery = 'INSERT INTO books (title, author, rating, date, synopsis, isbn) VALUES ($1, $2, $3, $4, $5, $6)';
         try {
-            await db.query(insertQuery, 
-                [title, 
-                author, 
-                rating, 
-                date, 
-                synopsis, 
-                isbn]
-            );
+            await db.query(insertQuery, [newTitle, newAuthor, newRating, newDate, newSynopsis, newIsbn]);
+            res.redirect("/");
         } catch (err) {
             console.log(err);        
-        }
-     } else {
-        res.redirect("/");
-    }       
+        }     
 });
+
+//Get edit form for a specific book 
+
 
 //Edit book
 app.post("/edit", async (req, res) => {
