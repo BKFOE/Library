@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+      <h1>Add a new Book!</h1>
+    <form action="/add" method="post">
+        <p>Book Title:</p>
+        <input type="text" name="newTitle" placeholder="Book Title" required>
+        <p>Author:</p>
+        <input type="text" name="newAuthor" placeholder="Author" required>
+        <p>Rating:</p>
+        <input type="text" name="newRating" placeholder="Rating from 1-5" required>
+        <p>Date:</p>
+        <input type="date" name="newDate" required>
+        <p>Synopsis:</p>
+        <textarea name="newSynopsis" placeholder="Synopsis"></textarea>
+        <p>ISBN:</p>
+        <input type="text" name="newIsbn" placeholder="ISBN" required>
+        <button type="submit">Add Book</button>
+
+    </form>
+</body>
+</html>
+
+  

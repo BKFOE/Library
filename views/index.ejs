@@ -9,8 +9,7 @@
         <h1 class="font-main text-6xl pt-[150px]"> Happy Reading</h1>
         <p class="font-body text-2xl py-14 max-w-2xl font-normal">Thank you for visiting my library! Here, you'll find a collection of books I've read, complete with personal symmaries and ratings on a 1-to-5-star scale. On the right you can see what I'm currently reading- stay tuned for my thoughts on that one soon!</p>
         <div class="flex flex-row pb-14">
-          <form action="/add" method="post">
-            <input type="submit" name="add" value="new" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+          <form action="/add" method="get">
         <button id="add<%=book.id%>" class="bg-accent-gold hover:bg-accent-gold/70 transition duration-500 rounded-full text-base font-bold text-white max-w-[200px] py-3 px-10" type="submit">Add A Book
           <img id="icon" class="inline-block w-6 h-6 hover:translate-x-1 duration-300 transform" src="/images/arrow_upward_24px.png" alt="upward arrow">
         </button>
