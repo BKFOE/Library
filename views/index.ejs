@@ -1,7 +1,7 @@
 <%- include('partials/header.ejs'); -%>
+
 <!-- Header -->
 <div class="flex w-full flex-col mb-32">
-  <% books.forEach(book => { %>
     <div class="bg-primary-tanGrey w-full">
       <div class="flex max-w-[1160px] mx-[140px] justify-between">
         <!--Left Section-->
@@ -10,7 +10,7 @@
         <p class="font-body text-2xl py-14 max-w-2xl font-normal">Thank you for visiting my library! Here, you'll find a collection of books I've read, complete with personal symmaries and ratings on a 1-to-5-star scale. On the right you can see what I'm currently reading- stay tuned for my thoughts on that one soon!</p>
         <div class="flex flex-row pb-14">
           <form action="/add" method="get">
-        <button id="add<%=book.id%>" class="bg-accent-gold hover:bg-accent-gold/70 transition duration-500 rounded-full text-base font-bold text-white max-w-[200px] py-3 px-10" type="submit">Add A Book
+        <button id="add" class="bg-accent-gold hover:bg-accent-gold/70 transition duration-500 rounded-full text-base font-bold text-white max-w-[200px] py-3 px-10" type="submit">Add A Book
           <img id="icon" class="inline-block w-6 h-6 hover:translate-x-1 duration-300 transform" src="/images/arrow_upward_24px.png" alt="upward arrow">
         </button>
       </form>
@@ -20,7 +20,7 @@
         <div class="flex flex-col items-center">
            <h1 class="font-main text-3xl mb-6 text-right pt-20">What I'm reading in <%= currentMonthName %>
            </h1>
-           <% if (latestBook.coverUrl) { %>
+           <% if (latestBook && latestBook.coverUrl) { %>
            <img id="cover" class="pt-6 max-w-xs h-fit pb-32" src="<%=latestBook.coverUrl%>" alt="book cover"> 
           <% } else { %>
             <p>No cover available</p>
@@ -57,9 +57,14 @@
         </p>
         
         <!--Book Recommendations-->
-        <section class="flex flex-row gap-8 mb-14">
+        <section class="flex flex-row gap-8 mb-14"> 
+          <% books.forEach(book => { %>
           <div class="flex flex-col sm:w-367">
-            <img id="titleCover" class=" max-w-xs h-fit mb-8 bg-contain" src="/images/bookcover.jpg" alt="book cover">
+            <% if (book.coverUrl) { %>
+            <img id="titleCover" class=" max-w-xs h-fit mb-8 bg-contain" src="<%=book.coverUrl%>" alt="book cover">
+            <% } else { %>
+              <img id="titleCover" class="max-w-xs h-fit mb-8 bg-contain" src="/images/pexels-jessbaileydesign-762687-min.jpg" alt="placeholder cover">
+            <% } %>
             <h3 id="title" class="mb-1.5 font-bold font-body text-2xl"><%= book.title %></h3>
             <p id="author" class="text-2xl">By: <%=book.author %></p>
             <p id="date" class="text-xl font-light">Read: <%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %> </p>
@@ -68,21 +73,22 @@
               <div class="flex-row flex space-x-1">
 
               <!--Edit book-->
-              <form action="/edit" method="post">
+              <form action="/edit" method="post">  
+                <button id="edit<%=book.id%>" type="button" class="w-6 h-6" onclick="handler('<%=book.id%>')">
+                <img src="/images/icons8-edit-24 1.png" alt="pencil image">
+              </button>
                 <input type="hidden" name="updatedBookId" value="<%= book.id %>">
                 <input id="input<%=book.id%>" type="text" name="updatedTitle" value="<%=book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true">
-                <input id="input <%=book.id%>" type="text" name="updatedAuthor" value="<%=book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
-                <input id="input <%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input <%=book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input <%=book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input <%=book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="input<%=book.id%>" type="text" name="updatedAuthor" value="<%=book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
+                <input id="input<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="input<%=book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="input<%=book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="input<%=book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
                <button id="done<%=book.id%>" type="submit" hidden class="w-6 h-6">
                 <img src="/images/icons8-check-30.png" alt="tick image">
                </button> 
             </form>
-            <button id="edit<%=book.id%>" class="w-6 h-6" onclick="handler('<%=book.id%>')">
-                <img src="/images/icons8-edit-24 1.png" alt="pencil image">
-              </button>
+          
               <form action="/delete" method="post">
                 <button id="done<%=book.id%>" value="<%=book.id%>" class="w-6 h-6" type="submit" onchange="this.form.submit()">
                   <img src="/images/delete_24px.png" alt="trash image">
@@ -97,10 +103,10 @@
             </a>
             </div>
           </div>
-
+          <% }); %>
         </section>
       </section>
-      <% }); %>
+    
     </div>
 
     <script>

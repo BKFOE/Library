@@ -22,6 +22,7 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.static("public"));
 
+
 //Get home page
 app.get("/", async (req,res) => {
     const today = new Date();
@@ -86,8 +87,6 @@ app.post("/add", async (req, res) => {
    
 });
 
-//Get edit form for a specific book 
-
 
 //Edit book
 app.post("/edit", async (req, res) => {
@@ -104,6 +103,7 @@ app.post("/edit", async (req, res) => {
 
 
 //Delete book
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
