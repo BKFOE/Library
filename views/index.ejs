@@ -32,7 +32,7 @@
 
     <!-- Content Section -->
      <section class="flex flex-col max-w-[1160px] pb-32 mx-[140px] justify-between">
-      <div class="flex flex-row justify-between mt-90 mb-60">
+      <div class="flex flex-row justify-between mt-90 mb-7">
       <h2 class="text-5xl font-main pb-8">Keep the story going...</h2>
       <!-- Sort Dropdown Menu-->
       <div class="relative inline-block text-left">
@@ -61,30 +61,34 @@
           <% books.forEach(book => { %>
           <div class="flex flex-col sm:w-367">
             <% if (book.coverUrl) { %>
-            <img id="titleCover" class=" max-w-xs h-fit mb-8 bg-contain" src="<%=book.coverUrl%>" alt="book cover">
+              <div class="w-[320px] h-[335px] overflow-hidden">
+                <img id="titleCover" class=" w-full h-full object-contain" src="<%=book.coverUrl%>" alt="book cover">
+              </div>
             <% } else { %>
-              <img id="titleCover" class="max-w-xs h-fit mb-8 bg-contain" src="/images/pexels-jessbaileydesign-762687-min.jpg" alt="placeholder cover">
+              <div class="w-[320px] h-[335px] overflow-hidden">
+                <img class="w-full h-full object-contain" src="/images/placeholder.jpg" alt="placeholder cover">
+              </div>
             <% } %>
-            <h3 id="title" class="mb-1.5 font-bold font-body text-2xl"><%= book.title %></h3>
-            <p id="author" class="text-2xl">By: <%=book.author %></p>
-            <p id="date" class="text-xl font-light">Read: <%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %> </p>
-            <div id="item" class="flex flex-row justify-between">
+            <h3 id="title<%= book.id %>" class="my-1.5 font-bold font-body text-2xl"><%= book.title %></h3>
+            <p id="author<%= book.id %>" class="text-2xl">By: <%=book.author %></p>
+            <p id="date<%= book.id %>" class="text-xl font-light">Read: <%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %> </p>
+            <div id="rating<%= book.id %>" class="flex flex-row justify-between">
               <div class="flex w-6 h-6 justify-start" data-rating="<%= book.rating%>"></div>
               <div class="flex-row flex space-x-1">
 
               <!--Edit book-->
               <form action="/edit" method="post">  
-                <button id="edit<%=book.id%>" type="button" class="w-6 h-6" onclick="handler('<%=book.id%>')">
+                <button id="edit<%= book.id %>" type="button" class="w-6 h-6" onclick="handler('<%= book.id %>')">
                 <img src="/images/icons8-edit-24 1.png" alt="pencil image">
               </button>
                 <input type="hidden" name="updatedBookId" value="<%= book.id %>">
-                <input id="input<%=book.id%>" type="text" name="updatedTitle" value="<%=book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true">
-                <input id="input<%=book.id%>" type="text" name="updatedAuthor" value="<%=book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
-                <input id="input<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input<%=book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input<%=book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="input<%=book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-               <button id="done<%=book.id%>" type="submit" hidden class="w-6 h-6">
+                <input id="inputTitle<%= book.id %>" type="text" name="updatedTitle" value="<%= book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true">
+                <input id="inputAuthor<%= book.id %>" type="text" name="updatedAuthor" value="<%= book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
+                <input id="inputRating<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="inputDate<%= book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="inputSynopsis<%= book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="inputIsbn<%= book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+               <button id="done<%= book.id%>" type="submit" hidden class="w-6 h-6">
                 <img src="/images/icons8-check-30.png" alt="tick image">
                </button> 
             </form>
@@ -125,11 +129,27 @@
       });
 
       function handler(id) {
-        document.getElementById("title" + id).setAttribute("hidden", true)
-        document.getElementById("edit" + id).setAttribute("hidden", true)
-        document.getElementById("done" + id).removeAttribute("hidden", true)
-        document.getElementById("input" + id).removeAttribute("hidden", true)
+        // Hide the display title
+        document.getElementById("title" + id).setAttribute("hidden", true);
+        // Hide the display author 
+        document.getElementById("author" + id).setAttribute("hidden", true);
+        // Hide the display date 
+        document.getElementById("date" + id).setAttribute("hidden", true);
+        // Hide the display rating 
+        document.getElementById("rating" + id).setAttribute("hidden", true);
+        // Hide the edit button 
+        document.getElementById("edit" + id).setAttribute("hidden", true);
+        // Show the submit button
+        document.getElementById("done" + id).removeAttribute("hidden");
+        // Show the input fields for editing 
+        document.getElementById("inputTitle" + id).removeAttribute("hidden");
+        document.getElementById("inputAuthor" + id).removeAttribute("hidden");
+        document.getElementById("inputRating" + id).removeAttribute("hidden");
+        document.getElementById("inputDate" + id).removeAttribute("hidden");
+        document.getElementById("inputSynopsis" + id).removeAttribute("hidden");
+        document.getElementById("inputIsbn" + id).removeAttribute("hidden");
       }
+
     </script>
 
 

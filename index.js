@@ -1,11 +1,12 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import axios from "axios";
 
 const app = express();
 const port = 3000;
 const API_URL = `https://covers.openlibrary.org/b/isbn/`;
-const size = 'M'
+const size = 'M';
 
 // Connect to database 
 const db = new pg.Client({
@@ -38,10 +39,21 @@ app.get("/", async (req,res) => {
         //Fetch book covers for each book
         const bookWithCovers = await Promise.all(
             books.map(async (book) => {
+                const coverUrl = `${API_URL}${book.isbn}-${size}.jpg`;
+               
                 try {
-                    const coverUrl = `${API_URL}${book.isbn}-${size}.jpg`;
-                    console.log(`Cover URL for book title ${book.title}:`, coverUrl);
-                    return {...book, coverUrl};
+                    // Get the response type for the cover 
+                    const response = await axios.get(coverUrl, {responseType: 'arraybuffer'});
+                    // Check image size of file type
+                    let contentLength = response.headers['content-length'];
+                    if (!contentLength) {
+                        contentLength = response.data.length;
+                    }
+                    const threshold = 300
+                    if (parseInt(contentLength) < threshold) {
+                        return {...book, coverUrl: '/images/placeholder.jpg'};
+                    }
+                        return {...book, coverUrl };
                 } catch (apiError) {
                     console.error(`Error fetching cover for ISBN: ${book.isbn}`, apiError);
                     return {...book, coverUrl: null};
@@ -103,6 +115,8 @@ app.post("/edit", async (req, res) => {
 
 
 //Delete book
+
+
 
 
 app.listen(port, () => {
