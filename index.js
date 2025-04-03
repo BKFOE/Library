@@ -115,9 +115,17 @@ app.post("/edit", async (req, res) => {
 
 
 //Delete book
-
-
-
+app.post("/delete", async (req, res) => {
+    const bookId = req.body.deleteBookId;
+    const deleteQuery = 'DELETE FROM books WHERE id = ($1)';
+    try {
+        await db.query(deleteQuery, [bookId]);
+        res.redirect("/");
+    } catch {
+        console.error("Error executing query", err.stack);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

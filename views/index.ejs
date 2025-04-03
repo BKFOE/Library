@@ -37,13 +37,13 @@
       <!-- Sort Dropdown Menu-->
       <div class="relative inline-block text-left">
         <div class="w-56">
-          <button type="button" class="inline-flex w-full gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900/50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 border-red-500" id="menu-button" aria-expanded="true" aria-haspopup="true"> Sort
+          <button type="button" class="inline-flex w-full gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900/50 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 border border-accent-gold" id="menu-button" aria-expanded="true" aria-haspopup="true"> Sort
             <svg class="-mr-1 size-5 text-accent-gold" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
               <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
             </svg>
           </button>
         </div>                    
-          <div class="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition ease-out duration-100 transform opacity-0 scale-95" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1" hidden>
+          <div id="menu-item" class="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none transition ease-out duration-100 transform opacity-0 scale-95" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1" hidden>
             <div class="py-1 Active:bg-gray-100 text-gray-900 outline-none Not Active:text-gray-700" role="none">
               <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-0">Title</a>
               <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1">Author</a>
@@ -82,11 +82,11 @@
                 <img src="/images/icons8-edit-24 1.png" alt="pencil image">
               </button>
                 <input type="hidden" name="updatedBookId" value="<%= book.id %>">
-                <input id="inputTitle<%= book.id %>" type="text" name="updatedTitle" value="<%= book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true">
-                <input id="inputAuthor<%= book.id %>" type="text" name="updatedAuthor" value="<%= book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden> 
-                <input id="inputRating<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="inputDate<%= book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
-                <input id="inputSynopsis<%= book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="inputTitle<%= book.id %>" type="text" name="updatedTitle" value="<%= book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true"  placeholder="Title">
+                <input id="inputAuthor<%= book.id %>" type="text" name="updatedAuthor" value="<%= book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Author" > 
+                <input id="inputRating<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Rating">
+                <input id="inputDate<%= book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Date">
+                <input id="inputSynopsis<%= book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden row="5">
                 <input id="inputIsbn<%= book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
                <button id="done<%= book.id%>" type="submit" hidden class="w-6 h-6">
                 <img src="/images/icons8-check-30.png" alt="tick image">
@@ -94,7 +94,8 @@
             </form>
           
               <form action="/delete" method="post">
-                <button id="done<%=book.id%>" value="<%=book.id%>" class="w-6 h-6" type="submit" onchange="this.form.submit()">
+                <input type="hidden" name="deleteBookId" value="<%= book.id %>">
+                <button id="done<%=book.id%>" value="<%=book.id%>" class="w-6 h-6" type="submit">
                   <img src="/images/delete_24px.png" alt="trash image">
                 </button>
               </form>
@@ -149,6 +150,15 @@
         document.getElementById("inputSynopsis" + id).removeAttribute("hidden");
         document.getElementById("inputIsbn" + id).removeAttribute("hidden");
       }
+        document.addEventListener("DOMContentLoaded", () => {
+          const menuButton = document.getElementById('menu-button');
+          const menuContent = document.getElementById('menu-item');
+          if (menuButton && menuContent) {
+            menuButton.addEventListener('click', function() {
+              menuContent.classList.toggle('hidden');
+        });
+       }
+      });
 
     </script>
 
