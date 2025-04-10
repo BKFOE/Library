@@ -57,7 +57,7 @@
         </p>
         
         <!--Book Recommendations-->
-        <section class="flex flex-row gap-8 mb-14"> 
+        <section id="book-container" class="flex flex-row gap-8 mb-14"> 
           <% books.forEach(book => { %>
           <div class="flex flex-col sm:w-367">
             <% if (book.coverUrl) { %>
@@ -82,12 +82,12 @@
                 <img src="/images/icons8-edit-24 1.png" alt="pencil image">
               </button>
                 <input type="hidden" name="updatedBookId" value="<%= book.id %>">
-                <input id="inputTitle<%= book.id %>" type="text" name="updatedTitle" value="<%= book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true"  placeholder="Title">
-                <input id="inputAuthor<%= book.id %>" type="text" name="updatedAuthor" value="<%= book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Author" > 
-                <input id="inputRating<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Rating">
-                <input id="inputDate<%= book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Date">
-                <input id="inputSynopsis<%= book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden row="5">
-                <input id="inputIsbn<%= book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden>
+                <input id="inputTitle<%= book.id %>" type="text" name="updatedTitle" value="<%= book.title %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden="true"  placeholder="Title" class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded my-2">
+                <input id="inputAuthor<%= book.id %>" type="text" name="updatedAuthor" value="<%= book.author %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Author" class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded mb-2"> 
+                <input id="inputRating<%= book.id %>" type="text" name="updatedRating" value="<%=book.rating%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Rating" class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded mb-2">
+                <input id="inputDate<%= book.id %>" type="text" name="updatedDate" value="<%= new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>" autocomplete="off" autocapitalize="on" autofocus="true" hidden placeholder="Date" class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded mb-2">
+                <input id="inputSynopsis<%= book.id %>" type="text" name="updatedSynopsis" value="<%=book.synopsis%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden row="5" class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded mb-2">
+                <input id="inputIsbn<%= book.id %>" type="text" name="updatedIsbn" value="<%=book.isbn%>" autocomplete="off" autocapitalize="on" autofocus="true" hidden class="w-full min-w-[320px] bg-white p-2 border border-gray-200 rounded mb-2">
                <button id="done<%= book.id%>" type="submit" hidden class="w-6 h-6">
                 <img src="/images/icons8-check-30.png" alt="tick image">
                </button> 
@@ -129,6 +129,61 @@
         });
       });
 
+      function sortBooks(sortBy) {
+        fetch(`/sort?criteria=${sortBy}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          const bookSection = document.querySelector('#book-container');
+          bookSection.innerHTML = `
+          <div class="flex flex-row flex-wrap gap-8 mb-14">
+            ${data.books.map(book => ` 
+            <div class="flex flex-col sm:w-367">
+              <div class="w-[320px] h-[335px] overflow-hidden">
+                <img class="w-full h-full object-contain" src="${book.coverUrl}" alt="book cover">
+        </div>
+            <h3 id="title${book.id}" class="my-1.5 font-bold font-body text-2xl">${book.title}</h3>
+            <p id="author${book.id}" class="text-2xl">By: ${book.author}</p>
+            <p id="date${book.id}" class="text-xl font-light">Read: ${new Date(book.date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })} </p>
+            <div id="rating${book.id}" class="flex flex-row justify-between">
+              <div class="flex w-6 h-6 justify-start" data-rating="${book.rating}"></div>
+              <div class="flex-row flex space-x-1">
+                <button onclick="handler(${book.id})" id="edit${book.id}" class="w-6 h-6">
+                  <img src="/images/icons8-edit-24 1.png" alt="edit">
+                  </button>
+                  <form action="/delete" method="post">
+                    <input type="hidden" name="deleteBookId" value="${book.id}">
+                    <button id="done${book.id}" class="w-6 h-6" type="submit">
+                      <img src="/images/delete_24px.png" alt="delete">
+                    </button>
+                  </form>
+                  </div>
+                  </div>
+              <p class="font-body text-base">${book.synopsis.slice(0, 140)}...</p>
+              </div>
+              `).join('')}
+          </div>`;
+      
+      // Reinitialize star ratings after updating content
+    const starContainer = document.querySelectorAll("[data-rating]");
+    starContainer.forEach(container => {
+      const rating = parseInt(container.getAttribute("data-rating"));
+      container.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const starImage = document.createElement('img');
+        starImage.src = i < rating ? "/images/full_star.png" : "/images/empty_star.png";
+        starImage.alt = i < rating ? "Full star" : "Empty star";
+        container.appendChild(starImage);
+      }
+    });
+  })
+  .catch(error => console.error('Error:', error));
+}
+      // Function to handle the edit button click
       function handler(id) {
         // Hide the display title
         document.getElementById("title" + id).setAttribute("hidden", true);
@@ -149,17 +204,44 @@
         document.getElementById("inputDate" + id).removeAttribute("hidden");
         document.getElementById("inputSynopsis" + id).removeAttribute("hidden");
         document.getElementById("inputIsbn" + id).removeAttribute("hidden");
-      }
-        document.addEventListener("DOMContentLoaded", () => {
-          const menuButton = document.getElementById('menu-button');
-          const menuContent = document.getElementById('menu-item');
-          if (menuButton && menuContent) {
-            menuButton.addEventListener('click', function() {
-              menuContent.classList.toggle('hidden');
-        });
-       }
-      });
+      };
 
+      const menuButton = document.getElementById('menu-button');
+      const menuItem = document.getElementById('menu-item');
+      menuButton.addEventListener('click', () => {
+        const isHidden = menuItem.hasAttribute('hidden');
+        if (isHidden) {
+          menuItem.removeAttribute('hidden');
+          menuItem.classList.remove('opacity-0', 'scale-95');
+          menuItem.classList.add('opacity-100', 'scale-100');
+        } else {
+          menuItem.setAttribute('hidden', true);
+          menuItem.classList.remove('opacity-100', 'scale-100');
+          menuItem.classList.add('opacity-0', 'scale-95');
+        }
+      });
+      menuItem.addEventListener('click', (event) => {
+        const selectedOption = event.target;
+        if (selectedOption.tagName === 'A') {
+          const selectedText = selectedOption.textContent;
+          menuButton.textContent = selectedText;
+          menuItem.setAttribute('hidden', true);
+          menuItem.classList.remove('opacity-100', 'scale-100');
+          menuItem.classList.add('opacity-0', 'scale-95');
+
+          const sortCriteria = selectedText.toLowerCase().trim();
+          sortBooks(sortCriteria);
+        }
+      });
+      document.addEventListener('click', (event) => {
+        const isClickInsideMenu = menuButton.contains(event.target) || menuItem.contains(event.target);
+        if (!isClickInsideMenu) {
+          menuItem.setAttribute('hidden', true);
+          menuItem.classList.remove('opacity-100', 'scale-100');
+          menuItem.classList.add('opacity-0', 'scale-95');
+        }
+      });
+      // Close the menu when clicking outside 
     </script>
 
 

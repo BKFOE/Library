@@ -74,6 +74,57 @@ app.get("/", async (req,res) => {
     }
 });
 
+//Sort books by criteria
+app.get('/sort', async (req, res) => {
+    const critieria = req.query.criteria;
+    let sortedBooks;
+
+    try {
+        switch (critieria) {
+            case 'author':
+                sortedBooks = await db.query("SELECT * FROM books ORDER BY author ASC");
+                break;
+            case 'title':
+                sortedBooks = await db.query("SELECT * FROM books ORDER BY title ASC");
+                break;
+            case 'date':
+                sortedBooks = await db.query("SELECT * FROM books ORDER BY date DESC");
+                break;
+            case 'rating':
+                sortedBooks = await db.query("SELECT * FROM books ORDER BY rating DESC");
+                break;
+            default:    
+                sortedBooks = await db.query("SELECT * FROM books ORDER BY id ASC");
+    }
+
+    //Add coverUrl to each book
+    const bookWithCovers = await Promise.all(
+        sortedBooks.rows.map(async(book) => {
+            const coverUrl = `${API_URL}${book.isbn}-${size}.jpg`;
+            try {
+                const response = await axios.get(coverUrl, {responseType: 'arraybuffer'});
+                let contentLength = response.headers['content-length'];
+                if (!contentLength) {
+                    contentLength = response.data.length;
+                }
+                const threshold = 300
+                if (parseInt(contentLength) < threshold) {
+                    return {...book, coverUrl: '/images/placeholder.jpg'};
+                }
+                return {...book, coverUrl };
+            } catch (apiError) {
+                console.error(`Error fetching cover for ISBN: ${book.isbn}`, apiError);
+                return {...book, coverUrl: '/images/placeholder.jpg'};
+            }
+        })
+    ); 
+        res.json({books: bookWithCovers});
+    } catch (err) {
+        console.error("Error fetching sorted books", err.stack);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 //Render new book submission form
 app.get("/add", (req,res) => {
     res.render("add.ejs");
