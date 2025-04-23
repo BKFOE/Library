@@ -135,4 +135,4 @@ dist
 .pnp.*
 
 .pgpass
-index.html
+queries.sql
